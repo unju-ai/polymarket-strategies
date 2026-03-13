@@ -2,38 +2,55 @@
 
 Automated prediction market strategy execution framework for Polymarket.
 
+## Quick Start: Copy a Successful Trader
+
+```bash
+# 1. Analyze a successful wallet
+python analysis/wallet_analyzer.py --wallet 0xSUCCESSFUL_WALLET --days 90
+
+# 2. Generate executable strategy code
+python analysis/strategy_replicator.py --wallet 0xSUCCESSFUL_WALLET --output strategies/my_strategy.py
+
+# 3. Paper trade the strategy
+python scripts/live_trade.py --strategy strategies/my_strategy.py --dry-run
+
+# 4. Deploy live (when confident)
+python scripts/live_trade.py --strategy strategies/my_strategy.py --api-key $YOUR_KEY
+```
+
+See [`analysis/README.md`](analysis/README.md) for detailed workflow.
+
 ## Overview
 
 This repository provides infrastructure for:
+- **Wallet Analysis**: Reverse-engineer strategies from successful traders
+- **Strategy Replication**: Auto-generate executable code from wallet patterns
+- **Data Pipeline**: Real-time ClickHouse ingestion (HTTP + WebSocket)
 - **Strategy Development**: Modular strategy framework
-- **Trade Execution**: Automated order placement and management
-- **Portfolio Management**: Position tracking and risk management
-- **Backtesting**: Historical performance analysis
-- **Live Trading**: Real-time strategy execution
+- **Live Trading**: Real-time execution with paper trading mode
+- **Backtesting**: Historical performance analysis *(coming soon)*
 
 ## Architecture
 
 ```
 polymarket-strategies/
-├── strategies/          # Strategy implementations
-│   ├── base.py         # Base strategy class
-│   ├── arbitrage.py    # Cross-market arbitrage
-│   ├── value.py        # Value betting (mispriced markets)
-│   ├── momentum.py     # Trend following
-│   └── market_making.py # Liquidity provision
-├── core/
-│   ├── client.py       # Polymarket API client
-│   ├── portfolio.py    # Position tracking
-│   ├── risk.py         # Risk management
-│   └── execution.py    # Order execution
-├── backtest/
-│   ├── engine.py       # Backtesting framework
-│   └── metrics.py      # Performance metrics
-├── config/
-│   └── strategies.yaml # Strategy configurations
-└── scripts/
-    ├── run_backtest.py # Run historical simulations
-    └── run_live.py     # Execute live strategies
+├── analysis/                    # Wallet analysis & replication
+│   ├── wallet_analyzer.py      # Reverse-engineer trading patterns (22KB)
+│   ├── strategy_replicator.py  # Generate strategy code (13KB)
+│   └── README.md               # Analysis workflow guide
+├── ingestion/                   # ClickHouse data pipeline
+│   ├── clickhouse_schema.sql   # Complete schema (9.5KB)
+│   ├── ingest.py               # Hybrid ingestion (polling + streaming)
+│   └── README.md               # Setup & query examples
+├── research/
+│   └── polymarket-data-sources.md  # API documentation (10.6KB)
+├── strategies/                  # Strategy implementations
+│   ├── base.py                 # Base strategy class
+│   └── (replicated strategies) # Auto-generated from wallet analysis
+├── scripts/                     # Execution
+│   ├── live_trade.py           # Live/paper trading engine (15KB)
+│   └── README.md               # Usage guide
+└── README.md                    # This file
 ```
 
 ## Common Polymarket Strategies
